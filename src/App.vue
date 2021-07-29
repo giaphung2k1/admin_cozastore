@@ -1,23 +1,46 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view/>
+    <router-view />
+    <notifications group="foo" position="bottom right" />
+    <loading v-bind:class="{ show: isLoading }" />
   </div>
 </template>
-
 <script>
-export default {
-  name: 'App'
-}
-</script>
+import Loading from "./components/Loading";
 
+import { TOKEN_NAME } from "./constants/config";
+import { mapActions, mapState } from "vuex";
+
+export default {
+  data() {
+    return {};
+  },
+  computed: {
+    ...mapState(["isLoading"])
+  },
+  methods: {
+    ...mapActions(["setValueLogin"])
+  },
+
+  created() {
+    let token = localStorage.getItem(TOKEN_NAME);
+    if (token) {
+      let data = {
+        token: token
+      };
+      this.setValueLogin(data).then(res => {
+        if (!res.ok) {
+          localStorage.removeItem(TOKEN_NAME);
+          this.$router.push({ name: "login" });
+        }
+      });
+    }
+  },
+  components: {
+    Loading
+  }
+};
+</script>
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
